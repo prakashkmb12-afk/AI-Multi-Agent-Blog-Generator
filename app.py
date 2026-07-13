@@ -190,9 +190,6 @@ api_key = os.getenv("GROQ_API_KEY")
 st.markdown("""
 <div style="text-align: center; margin-top: 1rem; margin-bottom: 2rem;">
     <h1 style="color: #F8FAFC; font-size: 2.5rem; font-weight: 700; margin-bottom: 0.5rem; letter-spacing: -0.025em;">AI Multi-Agent Blog Generator</h1>
-    <p style="color: #94A3B8; font-size: 1.05rem; line-height: 1.6; max-width: 650px; margin: 0 auto;">
-        Generate high-quality blog posts using a collaborative AI workflow powered by LangGraph, DuckDuckGo Search, and Groq Llama 3.
-    </p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -275,68 +272,30 @@ if generate_clicked:
             st.session_state["status"] = "idle"
             st.error(f"An error occurred during workflow execution: {str(e)}")
 
-# Display Tabs
-tab1, tab2 = st.tabs(["Generated Blog", "Research Data"])
+# Display Generated Blog preview directly
+st.markdown("### Generated Blog")
 
-with tab1:
-    if st.session_state["blog_post"]:
-        # Render Javascript copy button
-        components.html(get_copy_button_html(st.session_state["blog_post"]), height=45)
-        
-        # Scrollable preview container
-        st.markdown(f'<div class="blog-preview-card">', unsafe_allow_html=True)
-        st.markdown(st.session_state["blog_post"])
-        st.markdown('</div>', unsafe_allow_html=True)
-        
-        # Download button
-        safe_title = "".join(c for c in topic.lower() if c.isalnum() or c in (" ", "_", "-")).strip().replace(" ", "_")
-        if not safe_title:
-            safe_title = "generated"
-        st.download_button(
-            label="Download Blog Post",
-            data=st.session_state["blog_post"],
-            file_name=f"{safe_title}_blog.md",
-            mime="text/markdown"
-        )
-    else:
-        st.markdown('<div class="blog-preview-card" style="text-align: center; color: #64748B; padding: 60px 0;">Generated blog post will appear here...</div>', unsafe_allow_html=True)
-
-with tab2:
-    if st.session_state["research_data"]:
-        if isinstance(st.session_state["research_data"], list):
-            st.markdown("<div style='margin-top: 1rem;'>", unsafe_allow_html=True)
-            for source in st.session_state["research_data"]:
-                if isinstance(source, dict):
-                    title = source.get("title", "No Title")
-                    link = source.get("link", "#")
-                    snippet = source.get("snippet", "No Description")
-                    
-                    st.markdown(f"""
-                    <div class="source-card">
-                        <a class="source-title" href="{link}" target="_blank">{title}</a>
-                        <div class="source-link">{link}</div>
-                        <div class="source-snippet">{snippet}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    # Fallback for list of strings
-                    st.markdown(f"""
-                    <div class="source-card">
-                        <div class="source-snippet">{str(source)}</div>
-                    </div>
-                    """, unsafe_allow_html=True)
-            st.markdown("</div>", unsafe_allow_html=True)
-        else:
-            # Fallback for plain string research_data (from older runs)
-            st.text_area(
-                "Research Data Raw",
-                value=str(st.session_state["research_data"]),
-                height=400,
-                disabled=True,
-                label_visibility="collapsed"
-            )
-    else:
-        st.markdown('<div class="blog-preview-card" style="text-align: center; color: #64748B; padding: 60px 0;">Research data will appear here...</div>', unsafe_allow_html=True)
+if st.session_state["blog_post"]:
+    # Render Javascript copy button
+    components.html(get_copy_button_html(st.session_state["blog_post"]), height=45)
+    
+    # Scrollable preview container
+    st.markdown(f'<div class="blog-preview-card">', unsafe_allow_html=True)
+    st.markdown(st.session_state["blog_post"])
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    # Download button
+    safe_title = "".join(c for c in topic.lower() if c.isalnum() or c in (" ", "_", "-")).strip().replace(" ", "_")
+    if not safe_title:
+        safe_title = "generated"
+    st.download_button(
+        label="Download Blog Post",
+        data=st.session_state["blog_post"],
+        file_name=f"{safe_title}_blog.md",
+        mime="text/markdown"
+    )
+else:
+    st.markdown('<div class="blog-preview-card" style="text-align: center; color: #64748B; padding: 60px 0;">Generated blog post will appear here...</div>', unsafe_allow_html=True)
 
 # Footer
 st.markdown("""
