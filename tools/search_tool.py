@@ -1,22 +1,27 @@
 from duckduckgo_search import DDGS
 
-def search_web(query: str, max_results: int = 5) -> str:
+def search_web(query: str, max_results: int = 5) -> list:
     """
-    Searches DuckDuckGo for the given query and returns a formatted string of results.
+    Searches DuckDuckGo for the given query and returns a list of result dictionaries.
     """
     try:
         with DDGS() as ddgs:
-            results = list(ddgs.text(query, max_results=max_results))
-            if not results:
-                return f"No search results found for query: '{query}'."
+            raw_results = list(ddgs.text(query, max_results=max_results))
+            if not raw_results:
+                return []
             
-            formatted_results = []
-            for r in results:
-                title = r.get("title", "No Title")
-                href = r.get("href", "No Link")
-                body = r.get("body", "No Description")
-                formatted_results.append(f"Title: {title}\nLink: {href}\nSnippet: {body}\n---")
-            return "\n\n".join(formatted_results)
+            results = []
+            for r in raw_results:
+                results.append({
+                    "title": r.get("title", "No Title"),
+                    "link": r.get("href", "No Link"),
+                    "snippet": r.get("body", "No Description")
+                })
+            return results
     except Exception as e:
-        # Fallback message in case of network/rate-limit issues
-        return f"Error performing search for query '{query}': {str(e)}"
+        # Return fallback structured error result
+        return [{
+            "title": f"Error performing search for query: '{query}'",
+            "link": "#",
+            "snippet": str(e)
+        }]

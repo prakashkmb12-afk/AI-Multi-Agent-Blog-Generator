@@ -13,11 +13,23 @@ def writer_node(state: AgentState) -> dict:
     
     print(f"\n[Writer Agent] Generating blog post for: '{topic}' using Llama 3 via Groq...")
     
+    # Format research_data from list of dicts to string
+    if isinstance(research_data, list):
+        formatted_results = []
+        for r in research_data:
+            title = r.get("title", "No Title")
+            link = r.get("link", "No Link")
+            snippet = r.get("snippet", "No Description")
+            formatted_results.append(f"Title: {title}\nLink: {link}\nSnippet: {snippet}\n---")
+        formatted_research = "\n\n".join(formatted_results)
+    else:
+        formatted_research = str(research_data)
+        
     # Instantiate ChatGroq model
     llm = get_groq_llm()
     
     # Format the prompt template
-    formatted_prompt = WRITER_PROMPT.format(topic=topic, research_data=research_data)
+    formatted_prompt = WRITER_PROMPT.format(topic=topic, research_data=formatted_research)
     
     # Get response from the model
     response = llm.invoke(formatted_prompt)
